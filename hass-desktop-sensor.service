@@ -1,0 +1,9 @@
+[Unit]
+Description=Home Assistant Desktop Sensor
+
+[Service]
+Type=simple
+ExecStart=/path/to/hass-desktop-sensor
+
+[Install]
+WantedBy=multi-user.target
