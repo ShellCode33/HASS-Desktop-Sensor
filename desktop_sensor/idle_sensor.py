@@ -66,8 +66,8 @@ def get() -> BinarySensor:
 
     with _last_known_status_lock:
         return BinarySensor(name="Activity",
-                            type="presence",
-                            state=_last_known_status == "active")
+                            state=_last_known_status == "active",
+                            icon="mdi:account-question")
 
 def setup(idle_helper: str, interval: int) -> None:
 
