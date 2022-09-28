@@ -31,7 +31,8 @@ setup(
 
     install_requires=[
         "requests",
-        "psutil"
+        "psutil",
+        "humanize",
     ],
 
     entry_points={
