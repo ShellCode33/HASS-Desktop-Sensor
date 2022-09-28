@@ -53,7 +53,7 @@ def hass_update(sensors: List[Union[Sensor, BinarySensor]]) -> None:
         endpoint += f"sensor.{normalized_device_name}_{normalize_name(sensor.name)}"
 
         attributes = {
-            "friendly_name": f"{hass_device_name} {sensor.name}",
+            "friendly_name": sensor.name,
             "device_class": sensor.type,
             "icon": sensor.icon,
         } # type: Dict[str, Union[str, None]]
