@@ -55,6 +55,7 @@ def hass_update(sensors: List[Union[Sensor, BinarySensor]]) -> None:
         attributes = {
             "friendly_name": f"{hass_device_name} {sensor.name}",
             "device_class": sensor.type,
+            "icon": sensor.icon,
         } # type: Dict[str, Union[str, None]]
 
         if isinstance(sensor, Sensor):

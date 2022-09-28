@@ -44,13 +44,15 @@ def get() -> List[Union[Sensor, BinarySensor]]:
     sensors.append(Sensor(name="CPU Usage (Average)",
                           type="power_factor",
                           state=sum(cpu_usage) / len(cpu_usage),
-                          unit="%"))
+                          unit="%",
+                          icon="mdi:cpu-64-bit"))
 
     for i, usage in enumerate(cpu_usage):
         sensors.append(Sensor(name=f"CPU Usage (Core #{i})",
                               type="power_factor",
                               state=usage,
-                              unit="%"))
+                              unit="%",
+                              icon="mdi:cpu-64-bit"))
 
     battery = psutil.sensors_battery()
 
@@ -69,12 +71,13 @@ def get() -> List[Union[Sensor, BinarySensor]]:
     for mount_point in mount_points:
         sensors.append(Sensor(name=f"Disk usage of {mount_point}",
                               state=psutil.disk_usage(mount_point).percent,
-                              unit="%"))
+                              unit="%",
+                              icon="mdi:harddisk"))
 
     uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
-    sensors.append(Sensor(name="Uptime", state=human_delta(uptime), type="duration"))
+    sensors.append(Sensor(name="Uptime", state=human_delta(uptime), type="duration", icon="mdi:clock"))
 
-    sensors.append(Sensor(name="Used RAM", state=psutil.virtual_memory().percent, unit="%"))
-    sensors.append(Sensor(name="Used Swap", state=psutil.swap_memory().percent, unit="%"))
+    sensors.append(Sensor(name="Used RAM", state=psutil.virtual_memory().percent, unit="%", icon="mdi:memory"))
+    sensors.append(Sensor(name="Used Swap", state=psutil.swap_memory().percent, unit="%", icon="mdi:memory"))
 
     return sensors
