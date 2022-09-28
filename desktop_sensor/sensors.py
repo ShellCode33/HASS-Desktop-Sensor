@@ -7,10 +7,11 @@ from dataclasses import dataclass
 class BinarySensor:
     name: str
     state: bool
+    type: Optional[str] = None
 
 @dataclass(frozen=True)
 class Sensor:
     name: str
-    value: Union[str, int, float]
+    state: Union[str, int, float]
     unit: Optional[str] = None
     type: Optional[str] = None # See https://www.home-assistant.io/integrations/sensor/#device-class

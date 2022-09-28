@@ -5,6 +5,7 @@ import logging
 import time
 from threading import Thread, Lock
 from typing import Union, Literal, Optional
+from desktop_sensor.sensors import BinarySensor
 
 _last_known_status_lock = Lock()
 _last_known_status = "active" # type: Union[Literal["active"], Literal["idle"]]
@@ -58,13 +59,15 @@ def _run_xidlehook(interval: int) -> None:
 
     sensor_exception = IdleSensorException("xidlehook stopped running")
 
-def get() -> Union[Literal["idle"], Literal["active"]]:
+def get() -> BinarySensor:
 
     if sensor_exception:
         raise sensor_exception
 
     with _last_known_status_lock:
-        return _last_known_status
+        return BinarySensor(name="Activity",
+                            type="presence",
+                            state=_last_known_status == "active")
 
 def setup(idle_helper: str, interval: int) -> None:
 

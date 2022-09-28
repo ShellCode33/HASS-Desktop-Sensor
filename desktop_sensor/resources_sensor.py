@@ -1,10 +1,10 @@
 # coding: utf-8
 
-from typing import List
+from typing import List, Union
 import psutil
 from datetime import datetime
 
-from desktop_sensor.sensors import Sensor
+from desktop_sensor.sensors import BinarySensor, Sensor
 
 # From https://gist.github.com/dhrrgn/7255361
 def human_delta(tdelta):
@@ -36,42 +36,45 @@ def human_delta(tdelta):
 
     return fmt.format(**d)
 
-def get() -> List[Sensor]:
-    sensors = [] # type: List[Sensor]
+def get() -> List[Union[Sensor, BinarySensor]]:
+    sensors = [] # type: List[Union[Sensor, BinarySensor]]
 
-    cpu_usage = psutil.cpu_percent(percpu=True)
+    cpu_usage = psutil.cpu_percent(percpu=True) # List[float]
 
     sensors.append(Sensor(name="CPU Usage (Average)",
                           type="power_factor",
-                          value=sum(cpu_usage) / len(cpu_usage),
+                          state=sum(cpu_usage) / len(cpu_usage),
                           unit="%"))
 
     for i, usage in enumerate(cpu_usage):
         sensors.append(Sensor(name=f"CPU Usage (Core #{i})",
                               type="power_factor",
-                              value=usage,
+                              state=usage,
                               unit="%"))
 
     battery = psutil.sensors_battery()
 
     if battery:
-        # TODO : binary sensor on battery.power_plugged
+        sensors.append(BinarySensor(name="Charging",
+                              type="battery_charging",
+                              state=battery.power_plugged))
+
         sensors.append(Sensor(name="Battery State",
                               type="battery",
-                              value=battery.percent,
+                              state=battery.percent,
                               unit="%"))
 
     mount_points = {disk.mountpoint for disk in psutil.disk_partitions()}
 
     for mount_point in mount_points:
         sensors.append(Sensor(name=f"Disk usage of {mount_point}",
-                              value=psutil.disk_usage(mount_point).percent,
+                              state=psutil.disk_usage(mount_point).percent,
                               unit="%"))
 
     uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
-    sensors.append(Sensor(name="Uptime", value=human_delta(uptime), type="duration"))
+    sensors.append(Sensor(name="Uptime", state=human_delta(uptime), type="duration"))
 
-    sensors.append(Sensor(name="Used RAM", value=psutil.virtual_memory().percent, unit="%"))
-    sensors.append(Sensor(name="Used Swap", value=psutil.swap_memory().percent, unit="%"))
+    sensors.append(Sensor(name="Used RAM", state=psutil.virtual_memory().percent, unit="%"))
+    sensors.append(Sensor(name="Used Swap", state=psutil.swap_memory().percent, unit="%"))
 
     return sensors

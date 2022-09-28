@@ -1,11 +1,13 @@
 # coding: utf-8
 
+from desktop_sensor.sensors import BinarySensor, Sensor
 import os
 import sys
 import time
 import logging
 import argparse
 import requests
+from typing import List, Dict, Union
 from string import ascii_lowercase, digits
 from urllib.parse import urlparse
 
@@ -13,6 +15,7 @@ from desktop_sensor import idle_sensor, resources_sensor
 from desktop_sensor.idle_sensor import SUPPORTED_IDLE_HELPERS, IdleSensorException
 
 REQUIRED_ENV_VARIABLE = {"HASS_DEVICE_NAME", "HASS_URL", "HASS_ACCESS_TOKEN"}
+SENSOR_MODULES = {idle_sensor, resources_sensor}
 
 def normalize_name(name: str) -> str:
     allowed_charset = " _" + ascii_lowercase + digits
@@ -22,38 +25,58 @@ def normalize_name(name: str) -> str:
     normalized_name = "_".join(normalized_name.split())
     return normalized_name
 
-def hass_update() -> None:
+def hass_update(sensors: List[Union[Sensor, BinarySensor]]) -> None:
     hass_url = os.environ["HASS_URL"].strip()
-    hass_access_token = os.environ["HASS_ACCESS_TOKEN"].strip()
     hass_device_name = os.environ["HASS_DEVICE_NAME"].strip()
-
     normalized_device_name = normalize_name(hass_device_name)
 
     # Normalize URL because apparently Home Assistant returns 404 if url is like : http://hass:8123//api (double /)
     normalized_url = urlparse(hass_url)
-    normalized_url = f"{normalized_url.scheme}://{normalized_url.netloc}"
+    normalized_url = f"{normalized_url.scheme}://{normalized_url.netloc}/api/states/"
 
-    resp = requests.post(
-        f"{normalized_url}/api/states/binary_sensor.{normalized_device_name}",
-        headers={"Authorization": f"Bearer {hass_access_token}"},
-        json={"state": idle_sensor.get(), "attributes": {"friendly_name": hass_device_name}}
-    )
+    hass_access_token = os.environ["HASS_ACCESS_TOKEN"].strip()
 
-    if resp.status_code not in [200, 201]:
-        logging.error(f"HASS API returned {resp.content} (code: {resp.status_code})")
+    for sensor in sensors:
 
-    for sensor in resources_sensor.get():
+        if isinstance(sensor, BinarySensor):
+            state = "on" if sensor.state else "off"
+        elif isinstance(sensor, Sensor):
+            state = sensor.state
+        else:
+            raise TypeError(f"Expected Sensor or BinarySensor, got {sensor}")
+
+        endpoint = normalized_url
+
+        if isinstance(sensor, BinarySensor):
+            endpoint += "binary_"
+
+        endpoint += f"sensor.{normalized_device_name}_{normalize_name(sensor.name)}"
+
+        attributes = {
+            "friendly_name": f"{hass_device_name} {sensor.name}",
+            "device_class": sensor.type,
+        } # type: Dict[str, Union[str, None]]
+
+        if isinstance(sensor, Sensor):
+            attributes.update({"unit_of_measurement": sensor.unit})
+
         resp = requests.post(
-            f"{normalized_url}/api/states/sensor.{normalized_device_name}_{normalize_name(sensor.name)}",
+            endpoint,
             headers={"Authorization": f"Bearer {hass_access_token}"},
-            json={"state": sensor.value, "attributes": {"friendly_name": sensor.name,
-                                                        "device_class": sensor.type,
-                                                        "unit_of_measurement": sensor.unit}}
+            json={"state": state, "attributes": attributes}
         )
 
-        if resp.status_code not in [200, 201]:
+        if resp.status_code not in {200, 201}:
             logging.error(f"HASS API returned {resp.content} (code: {resp.status_code})")
 
+def process_sensors() -> None:
+    for sensor_module in SENSOR_MODULES:
+        sensors = sensor_module.get() # type: List[Union[BinarySensor, Sensor]]
+
+        if not isinstance(sensors, list):
+            sensors = [sensors]
+
+        hass_update(sensors)
 
 def parse_cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Welcome to the desktop sensor utility')
@@ -110,7 +133,7 @@ def main() -> None:
 
     try:
         while True:
-            hass_update()
+            process_sensors()
             time.sleep(args.report_interval)
     except IdleSensorException as ise:
         logging.error(f"idle sensor failed: {ise}")
