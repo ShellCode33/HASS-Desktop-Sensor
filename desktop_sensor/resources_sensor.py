@@ -43,14 +43,14 @@ def get() -> List[Union[Sensor, BinarySensor]]:
 
     sensors.append(Sensor(name="CPU Usage (Average)",
                           type="power_factor",
-                          state=sum(cpu_usage) / len(cpu_usage),
+                          state=int(sum(cpu_usage) / len(cpu_usage)),
                           unit="%",
                           icon="mdi:cpu-64-bit"))
 
     for i, usage in enumerate(cpu_usage):
         sensors.append(Sensor(name=f"CPU Usage (Core #{i})",
                               type="power_factor",
-                              state=usage,
+                              state=int(usage),
                               unit="%",
                               icon="mdi:cpu-64-bit"))
 
@@ -77,7 +77,7 @@ def get() -> List[Union[Sensor, BinarySensor]]:
     uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
     sensors.append(Sensor(name="Uptime", state=human_delta(uptime), type="duration", icon="mdi:clock"))
 
-    sensors.append(Sensor(name="Used RAM", state=psutil.virtual_memory().percent, unit="%", icon="mdi:memory"))
-    sensors.append(Sensor(name="Used Swap", state=psutil.swap_memory().percent, unit="%", icon="mdi:memory"))
+    sensors.append(Sensor(name="Used RAM", state=int(psutil.virtual_memory().percent), unit="%", icon="mdi:memory"))
+    sensors.append(Sensor(name="Used Swap", state=int(psutil.swap_memory().percent), unit="%", icon="mdi:memory"))
 
     return sensors
