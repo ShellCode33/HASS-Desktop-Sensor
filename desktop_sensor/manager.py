@@ -34,20 +34,7 @@ def hass_update(hass_url: str, hass_device_name: str, sensors: List[Union[Sensor
     hass_access_token = os.environ["HASS_ACCESS_TOKEN"].strip()
 
     for sensor in sensors:
-
-        if isinstance(sensor, BinarySensor):
-            state = "on" if sensor.state else "off"
-        elif isinstance(sensor, Sensor):
-            state = sensor.state
-        else:
-            raise TypeError(f"Expected Sensor or BinarySensor, got {sensor}")
-
         endpoint = normalized_url
-
-        if isinstance(sensor, BinarySensor):
-            endpoint += "binary_"
-
-        endpoint += f"sensor.{normalized_device_name}_{normalize_name(sensor.name)}"
 
         attributes = {
             "friendly_name": sensor.name,
@@ -55,8 +42,16 @@ def hass_update(hass_url: str, hass_device_name: str, sensors: List[Union[Sensor
             "icon": sensor.icon,
         } # type: Dict[str, Union[str, None]]
 
-        if isinstance(sensor, Sensor):
+        if isinstance(sensor, BinarySensor):
+            state = "on" if sensor.state else "off"
+            endpoint += "binary_"
+        elif isinstance(sensor, Sensor):
+            state = sensor.state
             attributes.update({"unit_of_measurement": sensor.unit})
+        else:
+            raise TypeError(f"Expected Sensor or BinarySensor, got {sensor}")
+
+        endpoint += f"sensor.{normalized_device_name}_{normalize_name(sensor.name)}"
 
         try:
             resp = requests.post(
