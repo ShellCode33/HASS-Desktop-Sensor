@@ -34,7 +34,7 @@ def get() -> List[Union[Sensor, BinarySensor]]:
 
         sensors.append(Sensor(name="Battery State",
                               type="battery",
-                              state=battery.percent,
+                              state=int(battery.percent),
                               unit="%"))
 
     mount_points = {disk.mountpoint for disk in psutil.disk_partitions()}
