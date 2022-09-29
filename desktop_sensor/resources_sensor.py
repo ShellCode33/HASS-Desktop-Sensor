@@ -46,7 +46,7 @@ def get() -> List[Union[Sensor, BinarySensor]]:
                               icon="mdi:harddisk"))
 
     uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
-    sensors.append(Sensor(name="Uptime", state=humanize.precisedelta(uptime), type="duration", icon="mdi:clock"))
+    sensors.append(Sensor(name="Uptime", state=humanize.precisedelta(uptime, suppress=["seconds"], format="%d"), type="duration", icon="mdi:clock"))
 
     sensors.append(Sensor(name="Used RAM", state=int(psutil.virtual_memory().percent), unit="%", icon="mdi:memory"))
     sensors.append(Sensor(name="Used Swap", state=int(psutil.swap_memory().percent), unit="%", icon="mdi:memory"))
