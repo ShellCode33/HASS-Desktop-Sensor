@@ -31,9 +31,9 @@ setup(
     ],
 
     install_requires=[
-        "humanize==4.4.0",
-        "psutil==5.9.2",
-        "requests==2.28.1",
+        "humanize",
+        "psutil",
+        "requests",
     ],
 
     entry_points={
