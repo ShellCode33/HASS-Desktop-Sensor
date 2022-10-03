@@ -11,13 +11,13 @@ By default you'll be considered idle if you don't use the mouse and keyboard for
 Note that if you're playing some audio, you won't be considered idle. This is to prevent
 false positives while watching videos.
 
-The Desktop Sensor will report status to HASS every 5 seconds by default.
+The Desktop Sensor will report status to Home Assistant every 5 seconds by default.
 
 ## Requirements
 
 - [Install xidlehook](https://github.com/jD91mZM2/xidlehook#installation)
 - Enable the [API integration](https://www.home-assistant.io/integrations/api/) of Home Assistant (just add `api:` to your `configuration.yaml`).
-- Create a long-lived access token (go to your profile in Home Assistant, scroll down to the bottom, and click "Create Token")
+- Create a long-lived access token (go to your profile in Home Assistant, scroll to the bottom, and click "Create Token")
 
 ## Installation
 
@@ -37,7 +37,7 @@ To test your automations, you can pass `--idle-delay 1` and `--report-interval 1
 You will be considered idle after 1 second, and your idleness status will be reported every second.
 This is useful for debug purposes but I don't recommend doing that in real world scenarios.
 
-*Note:* You can increase log verbosity by setting `LOGLEVEL=DEBUG` at the beginning of your command line.
+*Note: You can increase log verbosity by setting `LOGLEVEL=DEBUG` at the beginning of your command line.*
 
 ## Automatic startup
 
