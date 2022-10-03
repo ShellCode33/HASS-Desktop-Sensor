@@ -18,9 +18,10 @@ setup(
     author_email='shellcode33@protonmail.ch',
     url='https://github.com/ShellCode33/HASS-Desktop-Sensor',
     packages=find_packages(),
-    python_requires='>=3.7',
+    python_requires='>=3.6',
 
     classifiers=[
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
@@ -30,9 +31,9 @@ setup(
     ],
 
     install_requires=[
-        "requests",
-        "psutil",
-        "humanize",
+        "humanize==4.4.0",
+        "psutil==5.9.2",
+        "requests==2.28.1",
     ],
 
     entry_points={
