@@ -44,22 +44,28 @@ This is useful for debug purposes but I don't recommend doing that in real world
 Chances are you are using systemd, if you're not, you're on your own. But I'm pretty sure if you're not
 using systemd you'll figure out by yourself how to automatically start this script :)
 
-So... For systemd users, create a service file with the following content :
+So... For systemd users, create `~/.config/systemd/user/hass-desktop-sensor.service` with the following content :
 
 ```ini
 [Unit]
 Description=Home Assistant Desktop Sensor
+After=network-online.target pulseaudio.service
 
 [Service]
 Type=simple
+Environment=DISPLAY=:0
 Environment=HASS_ACCESS_TOKEN=[YOUR ACCESS TOKEN HERE]
-ExecStart=hass_desktop_sensor --hass-url 'http://homeassistant.local:8123' --hass-device-name 'My Laptop'
+ExecStart=%h/.local/bin/hass_desktop_sensor --hass-url 'http://homeassistant.local:8123' --hass-device-name 'My Laptop'
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
-## Ping integration
+Then run `systemctl --user start hass-desktop-sensor` to make sure the service starts properly.
+
+If it does, enable the service using `systemctl --user enable hass-desktop-sensor`.
+
+## Improved resilience
 
 If for whatever reason the desktop sensor is not able to report idleness (power failure, network issues, etc.)
 some of your automations might not trigger. This is why additionnaly to this desktop sensor, I suggest you
