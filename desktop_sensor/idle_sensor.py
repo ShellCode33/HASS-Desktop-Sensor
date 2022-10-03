@@ -4,11 +4,11 @@ import subprocess
 import logging
 import time
 from threading import Thread, Lock
-from typing import Union, Literal, Optional
+from typing import Optional
 from desktop_sensor.sensors import BinarySensor
 
 _last_known_status_lock = Lock()
-_last_known_status = "active" # type: Union[Literal["active"], Literal["idle"]]
+_last_known_status = "active"
 sensor_exception = None # type: Optional[IdleSensorException]
 
 SUPPORTED_IDLE_HELPERS = {
