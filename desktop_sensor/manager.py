@@ -74,7 +74,7 @@ def parse_cli() -> argparse.Namespace:
     parser.add_argument('--hass-url', help="URL (including port) to your Home Assistant instance")
 
     parser.add_argument('--idle-helper', choices=SUPPORTED_IDLE_HELPERS, default="xidlehook", help="the external binary that should be used to detect activity")
-    parser.add_argument('--idle-delay', type=int, help="the delay (in seconds) to wait before the user must be considered idle", default=60 * 3)
+    parser.add_argument('--idle-delay', type=int, help="the delay (in seconds) to wait before the user must be considered idle", default=60 * 5)
     parser.add_argument('--report-interval', type=int, help="the interval (in seconds) at which reports will be made to Home Assistant", default=5)
 
     args = parser.parse_args()
