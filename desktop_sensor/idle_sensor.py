@@ -29,13 +29,17 @@ def _run_xidlehook(interval: int) -> None:
             "--timer", str(interval),
             "echo idle",
             "echo active"
-        ], stdout=subprocess.PIPE)
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         time.sleep(0.2) # Give it some time to start properly
     except FileNotFoundError:
         sensor_exception = IdleSensorException(f"xidlehook not found, make sure it's available")
         return
 
     if process.stdout is None:
+        sensor_exception = IdleSensorException("stdout is not accessible")
+        return
+
+    if process.stderr is None:
         sensor_exception = IdleSensorException("stdout is not accessible")
         return
 
@@ -56,6 +60,9 @@ def _run_xidlehook(interval: int) -> None:
             logging.error(f"Unexpected status value: {status}")
 
         time.sleep(0.5)
+
+    for line in process.stderr:
+        logging.error(f"xidlehook: {line.decode().strip()}")
 
     sensor_exception = IdleSensorException("xidlehook stopped running")
 
