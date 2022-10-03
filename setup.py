@@ -7,8 +7,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='HASS-Desktop-Sensor',
-    version='1.0.1',
+    name='hass-desktop-sensor',
+    version='1.0',
     description='Desktop activity sensor for Home Assistant',
     long_description=long_description,
     long_description_content_type='text/markdown',
